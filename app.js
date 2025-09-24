@@ -60,3 +60,31 @@ function saveData() {
 
 // Automatisch opslaan bij wijziging
 document.getElementById('urenTabel').addEventListener('change', saveData);
+
+
+document.getElementById('closeWeekBtn').addEventListener('click', () => {
+  const data = JSON.parse(localStorage.getItem('urenregistratie')) || [];
+
+  if (data.length === 0) {
+    alert('Er zijn geen gegevens om op te slaan.');
+    return;
+  }
+
+  const weekNumber = getCurrentWeek();
+  const archiveKey = `uren_week_${weekNumber}_${new Date().getFullYear()}`;
+
+  let archives = JSON.parse(localStorage.getItem('uren_archief')) || [];
+  archives.push({ key: archiveKey, data });
+  localStorage.setItem('uren_archief', JSON.stringify(archives));
+
+  localStorage.removeItem('urenregistratie');
+  document.getElementById('urenBody').innerHTML = '';
+  alert(`Week ${weekNumber} is succesvol opgeslagen.`);
+});
+
+function getCurrentWeek() {
+  const today = new Date();
+  const oneJan = new Date(today.getFullYear(), 0, 1);
+  const numberOfDays = Math.floor((today - oneJan) / (24 * 60 * 60 * 1000));
+  return Math.ceil((today.getDay() + 1 + numberOfDays) / 7);
+}
