@@ -84,7 +84,22 @@ function getISOWeek(d){
 
 function closeWeek(){
   const data = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
-  if(!data.length){ alert('Geen gegevens om op te slaan.'); return; }
+  // Toegevoegd: ook week zonder uren kunnen afsluiten
+  const today = new Date();
+  const key = `uren_week_${getISOWeek(today)}_${today.getFullYear()}`;
+  const archives = JSON.parse(localStorage.getItem('uren_archief')||'[]');
+  const payload = { key, data, closedAt: new Date().toISOString(), zeroWeek: data.length === 0 };
+  archives.push(payload);
+  localStorage.setItem('uren_archief', JSON.stringify(archives));
+  if (UREN_CH) UREN_CH.postMessage({ type: 'update', scope: 'archive' });
+  localStorage.removeItem('urenregistratie');
+  localStorage.setItem('uren_last_updated', String(Date.now())); // trigger dashboards
+  // Reset UI
+  const body = document.getElementById('urenBody'); if (body) body.innerHTML='';
+  for(let i=0;i<5;i++) addRow();
+  // Ga direct naar dashboard zodat gebruiker nieuwe cijfers ziet
+  window.location.href = 'dashboard.html?refresh=1';
+}
   const today = new Date();
   const key = `uren_week_${getISOWeek(today)}_${today.getFullYear()}`;
   const archives = JSON.parse(localStorage.getItem('uren_archief')||'[]');
