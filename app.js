@@ -1,11 +1,8 @@
 // Urenregistratie logic (with archive + sync + BroadcastChannel)
 const UREN_CH = ('BroadcastChannel' in window) ? new BroadcastChannel('uren_sync') : null;
-
 // --- Safe DOM helpers ---
 function byId(id){ return document.getElementById(id); }
 function on(id, evt, handler){ const el = byId(id); if (el) el.addEventListener(evt, handler); }
-
-const UREN_CH = ('BroadcastChannel' in window) ? new BroadcastChannel('uren_sync') : null;
 function qs(sel, ctx=document){ return ctx.querySelector(sel); }
 function qsa(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)); }
 
@@ -87,7 +84,7 @@ function weeksInYear(y){
   return (w === 1) ? 52 : w;
 }
 function initAdvancedCloseControls(){
-  if (!byId('closeYear') || !byId('closeWeek') || !byId('closeNote') || !byId('closeSelectedWeekBtn') || !byId('toggleAdvancedBtn')) { return; }
+  if (!document.getElementById('closeYear') || !document.getElementById('closeWeek') || !document.getElementById('closeNote') || !document.getElementById('closeSelectedWeekBtn') || !document.getElementById('toggleAdvancedBtn')) { return; }
   const yearInput = document.getElementById('closeYear');
   const weekSelect = document.getElementById('closeWeek');
   const noteInput = document.getElementById('closeNote');
@@ -214,11 +211,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   on('closeWeekBtn','click', closeWeek);
   on('exportActiveBtn','click', exportActive);
 
-  try {
+  try{
     const existing = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
     if(existing.length) existing.forEach(addRow); else for(let i=0;i<5;i++) addRow();
-  } catch(e) {
-    console.warn('Init rows fallback due to error:', e);
+  }catch(err){
+    console.warn('Init rows failed, creating fallback rows', err);
     for(let i=0;i<5;i++) addRow();
   }
 });
