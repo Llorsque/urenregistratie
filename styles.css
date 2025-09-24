@@ -79,3 +79,8 @@ input[type="date"],input[type="time"],select{width:100%;padding:10px 12px;border
   body{background:#fff}
   .card.glass{border:none}
 }
+
+.mini-card{ padding:12px; border-radius:16px; margin:10px 0; }
+.advanced-close .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+.advanced-close label{ display:flex; flex-direction:column; min-width:140px; color:var(--subtle); }
+.advanced-close input[type="number"]{ padding:10px 12px; border-radius:12px; border:1px solid var(--stroke); background:#fff; font-size:15px; }

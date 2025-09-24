@@ -105,7 +105,9 @@ function renderArchiveList(archives){
     const total = (w.data||[]).reduce((a,b)=>a+(+b.uren||0),0).toFixed(2);
     const el = document.createElement('div');
     el.className='archive-item';
-    el.innerHTML = `<div><strong>${w.key}</strong><div class="meta">Gesloten: ${new Date(w.closedAt).toLocaleString('nl-NL')}</div></div>
+    const note = w.note ? ` • Notitie: ${w.note}` : '';
+    const zero = w.zeroWeek ? ` • 0-uren` : '';
+    el.innerHTML = `<div><strong>${w.key}</strong><div class="meta">Gesloten: ${new Date(w.closedAt).toLocaleString('nl-NL')}${note}${zero}</div></div>
                     <div>
                       <button class="btn" data-k="${w.key}" data-act="export">⬇︎ CSV</button>
                       <button class="btn subtle" data-k="${w.key}" data-act="restore">↩︎ Heropen</button>

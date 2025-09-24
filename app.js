@@ -1,5 +1,11 @@
 // Urenregistratie logic (with archive + sync + BroadcastChannel)
 const UREN_CH = ('BroadcastChannel' in window) ? new BroadcastChannel('uren_sync') : null;
+
+// --- Safe DOM helpers ---
+function byId(id){ return document.getElementById(id); }
+function on(id, evt, handler){ const el = byId(id); if (el) el.addEventListener(evt, handler); }
+
+const UREN_CH = ('BroadcastChannel' in window) ? new BroadcastChannel('uren_sync') : null;
 function qs(sel, ctx=document){ return ctx.querySelector(sel); }
 function qsa(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)); }
 
@@ -73,6 +79,53 @@ function saveData(){
   if (UREN_CH) UREN_CH.postMessage({ type: 'update', scope: 'active' });
 }
 
+
+function weeksInYear(y){
+  // ISO weeks: week 53 exists if Jan 1 is Thursday or leap year starting on Wednesday
+  const d = new Date(y, 11, 31);
+  const w = getISOWeek(d);
+  return (w === 1) ? 52 : w;
+}
+function initAdvancedCloseControls(){
+  if (!byId('closeYear') || !byId('closeWeek') || !byId('closeNote') || !byId('closeSelectedWeekBtn') || !byId('toggleAdvancedBtn')) { return; }
+  const yearInput = document.getElementById('closeYear');
+  const weekSelect = document.getElementById('closeWeek');
+  const noteInput = document.getElementById('closeNote');
+  const now = new Date();
+  yearInput.value = now.getFullYear();
+  // populate weeks
+  function fillWeeks(){
+    const total = weeksInYear(parseInt(yearInput.value,10));
+    weekSelect.innerHTML = '';
+    for(let i=1;i<=total;i++){
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = i;
+      weekSelect.appendChild(opt);
+    }
+    // preselect current week
+    const cw = getISOWeek(now);
+    if (cw <= total) weekSelect.value = String(cw);
+  }
+  fillWeeks();
+  yearInput.addEventListener('change', fillWeeks);
+
+  document.getElementById('closeSelectedWeekBtn').addEventListener('click', ()=>{
+    const y = parseInt(yearInput.value,10);
+    const w = parseInt(weekSelect.value,10);
+    const note = (noteInput.value||'').trim();
+    closeSpecificWeek(y, w, note);
+  });
+  const toggleBtn = document.getElementById('toggleAdvancedBtn');
+  toggleBtn.addEventListener('click', ()=>{
+    document.querySelector('.advanced-close').style.display = 'none';
+  });
+}
+function showAdvanced(){
+  const panel = document.querySelector('.advanced-close');
+  panel.style.display = 'block';
+}
+
 function getISOWeek(d){
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = date.getUTCDay() || 7;
@@ -84,7 +137,6 @@ function getISOWeek(d){
 
 function closeWeek(){
   const data = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
-  // Toegevoegd: ook week zonder uren kunnen afsluiten
   const today = new Date();
   const key = `uren_week_${getISOWeek(today)}_${today.getFullYear()}`;
   const archives = JSON.parse(localStorage.getItem('uren_archief')||'[]');
@@ -93,11 +145,25 @@ function closeWeek(){
   localStorage.setItem('uren_archief', JSON.stringify(archives));
   if (UREN_CH) UREN_CH.postMessage({ type: 'update', scope: 'archive' });
   localStorage.removeItem('urenregistratie');
-  localStorage.setItem('uren_last_updated', String(Date.now())); // trigger dashboards
-  // Reset UI
-  const body = document.getElementById('urenBody'); if (body) body.innerHTML='';
+  localStorage.setItem('uren_last_updated', String(Date.now()));
+  document.getElementById('urenBody').innerHTML='';
   for(let i=0;i<5;i++) addRow();
-  // Ga direct naar dashboard zodat gebruiker nieuwe cijfers ziet
+  window.location.href = 'dashboard.html?refresh=1';
+}
+
+function closeSpecificWeek(year, week, note){
+  // Sluit expliciet een week/jaar af met optionele notitie. Neemt de huidige actieve regels als payload.
+  const data = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
+  const archives = JSON.parse(localStorage.getItem('uren_archief')||'[]');
+  const key = `uren_week_${week}_${year}`;
+  const payload = { key, data, closedAt: new Date().toISOString(), note: note || null, zeroWeek: data.length === 0 };
+  archives.push(payload);
+  localStorage.setItem('uren_archief', JSON.stringify(archives));
+  if (UREN_CH) UREN_CH.postMessage({ type: 'update', scope: 'archive' });
+  localStorage.removeItem('urenregistratie');
+  localStorage.setItem('uren_last_updated', String(Date.now()));
+  document.getElementById('urenBody').innerHTML='';
+  for(let i=0;i<5;i++) addRow();
   window.location.href = 'dashboard.html?refresh=1';
 }
   const today = new Date();
@@ -142,10 +208,17 @@ function maybeAddAutoRow(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  qs('#addRowBtn').addEventListener('click', ()=>{ addRow(); saveData(); });
-  qs('#closeWeekBtn').addEventListener('click', closeWeek);
-  qs('#exportActiveBtn').addEventListener('click', exportActive);
+  initAdvancedCloseControls();
+  document.getElementById('advancedCloseBtn').addEventListener('click', showAdvanced);
+  on('addRowBtn','click', ()=>{ addRow(); saveData(); });
+  on('closeWeekBtn','click', closeWeek);
+  on('exportActiveBtn','click', exportActive);
 
-  const existing = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
-  if(existing.length) existing.forEach(addRow); else for(let i=0;i<5;i++) addRow();
+  try {
+    const existing = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
+    if(existing.length) existing.forEach(addRow); else for(let i=0;i<5;i++) addRow();
+  } catch(e) {
+    console.warn('Init rows fallback due to error:', e);
+    for(let i=0;i<5;i++) addRow();
+  }
 });

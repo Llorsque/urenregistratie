@@ -33,9 +33,28 @@
         <div class="hint">Voer je uren in. Bij de laatste ingevulde rij verschijnt automatisch een nieuwe.</div>
         <div class="actions">
           <button id="addRowBtn" class="btn">＋ Voeg regel toe</button>
-          <button id="closeWeekBtn" class="btn warn">⎗ Sluit week af</button>
+          <button id="closeWeekBtn" class="btn warn">⎗ Sluit huidige week af</button>
+          <button id="advancedCloseBtn" class="btn subtle">Geavanceerd…</button>
+        </div>
+      
+      <div class="advanced-close glass mini-card" style="display:none;">
+        <div class="row">
+          <label>Jaar
+            <input type="number" id="closeYear" min="2000" max="2100" />
+          </label>
+          <label>Weeknr
+            <select id="closeWeek"></select>
+          </label>
+          <label>Notitie
+            <input type="text" id="closeNote" placeholder="(optioneel)" />
+          </label>
+        </div>
+        <div class="row">
+          <button id="closeSelectedWeekBtn" class="btn warn">⎗ Sluit geselecteerde week af</button>
+          <button id="toggleAdvancedBtn" class="btn subtle">Sluiten</button>
         </div>
       </div>
+
 
       <div class="table-wrap">
         <table id="urenTabel" class="ios-table">
