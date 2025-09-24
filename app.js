@@ -1,4 +1,5 @@
-// Urenregistratie logic (with archive + sync)
+// Urenregistratie logic (with archive + sync + BroadcastChannel)
+const UREN_CH = ('BroadcastChannel' in window) ? new BroadcastChannel('uren_sync') : null;
 function qs(sel, ctx=document){ return ctx.querySelector(sel); }
 function qsa(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)); }
 
@@ -69,6 +70,7 @@ function saveData(){
   })).filter(r => r.datum || r.start || r.eind || r.project);
   localStorage.setItem('urenregistratie', JSON.stringify(rows));
   localStorage.setItem('uren_last_updated', String(Date.now()));
+  if (UREN_CH) UREN_CH.postMessage({ type: 'update', scope: 'active' });
 }
 
 function getISOWeek(d){
@@ -88,8 +90,10 @@ function closeWeek(){
   const archives = JSON.parse(localStorage.getItem('uren_archief')||'[]');
   archives.push({ key, data, closedAt: new Date().toISOString() });
   localStorage.setItem('uren_archief', JSON.stringify(archives));
+  if (UREN_CH) UREN_CH.postMessage({ type: 'update', scope: 'archive' });
   localStorage.removeItem('urenregistratie');
-  localStorage.setItem('uren_last_updated', String(Date.now())); // trigger dashboards
+  localStorage.setItem('uren_last_updated', String(Date.now()));
+  if (UREN_CH) UREN_CH.postMessage({ type: 'update', scope: 'active' }); // trigger dashboards
   // Reset UI
   qs('#urenBody').innerHTML='';
   for(let i=0;i<5;i++) addRow();

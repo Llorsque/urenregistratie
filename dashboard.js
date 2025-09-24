@@ -133,6 +133,8 @@ function fullRender(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  const UREN_CH = ('BroadcastChannel' in window) ? new BroadcastChannel('uren_sync') : null;
+  if (UREN_CH) UREN_CH.onmessage = (e)=>{ if (e && e.data && e.data.type==='update') fullRender(); };
   fullRender();
   qs('#applyFiltersBtn').addEventListener('click', ()=>{ const all = loadAllData().all; applyFilters(all); });
   qs('#resetFiltersBtn').addEventListener('click', ()=>{ qsa('select,input[type="date"]','.filters').forEach(el=>el.value=''); fullRender(); });
