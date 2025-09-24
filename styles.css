@@ -1,68 +1,84 @@
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to right, #e6ecf0, #f9fbfc);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #f9fafb;
   margin: 0;
   padding: 0;
+  color: #1c1c1e;
 }
 
-.container {
-  background: #ffffff;
-  padding: 2rem;
+.topbar {
+  background: #ffffffcc;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #e5e5ea;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.topbar h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.nav-button {
+  text-decoration: none;
+  background: #007aff;
+  color: #fff;
+  padding: 0.5rem 1rem;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  max-width: 1000px;
-  margin: 3rem auto;
-  border: 1px solid #dce3e8;
+  font-size: 0.95rem;
 }
 
-h1 {
-  text-align: center;
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 2rem;
+.container.content {
+  background: #fff;
+  margin: 2rem auto;
+  padding: 2rem;
+  max-width: 1000px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 th {
-  background-color: #f2f6f9;
-  color: #555;
+  background-color: #f2f2f7;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 th, td {
-  padding: 0.75rem 1rem;
-  border: 1px solid #dee2e6;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e5ea;
   text-align: left;
-  font-size: 0.95rem;
 }
 
-input[type='text'],
-input[type='date'],
-input[type='time'],
-select {
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.9rem;
+input[type='text'], input[type='date'], input[type='time'], select {
   width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #d1d1d6;
+  border-radius: 10px;
+  background: #f9f9fb;
 }
 
 button {
-  background-color: #007aff;
+  background: #007aff;
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  border-radius: 12px;
   cursor: pointer;
-  margin-right: 0.5rem;
-  transition: background-color 0.2s ease;
+  margin-top: 0.5rem;
 }
 
 button:hover {
@@ -72,13 +88,12 @@ button:hover {
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .filters label {
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
-  color: #333;
 }
