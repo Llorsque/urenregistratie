@@ -1,8 +1,8 @@
-// --- Urenregistratie Pro ---
+// Urenregistratie logic (with archive + sync)
 function qs(sel, ctx=document){ return ctx.querySelector(sel); }
 function qsa(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)); }
 
-function createProjectSelect(value="") {
+function createProjectSelect(value=""){
   const html = `<select>
     <option value="">Selecteer...</option>
     <option value="Opsterland">Opsterland</option>
@@ -11,14 +11,11 @@ function createProjectSelect(value="") {
     <option value="Team Opwest">Team Opwest</option>
     <option value="Overig">Overig</option>
   </select>`;
-  const temp = document.createElement('div');
-  temp.innerHTML = html.trim();
-  const el = temp.firstChild;
-  el.value = value;
-  return el;
+  const temp = document.createElement('div'); temp.innerHTML = html.trim();
+  const el = temp.firstChild; el.value = value; return el;
 }
 
-function addRow(prefill={}) {
+function addRow(prefill={}){
   const tbody = qs('#urenBody');
   const tr = document.createElement('tr');
 
@@ -44,7 +41,7 @@ function addRow(prefill={}) {
   del.addEventListener('click', ()=>{ tr.remove(); saveData(); });
   tdDel.appendChild(del);
 
-  [date,start,end,proj].forEach(el => {
+  [date,start,end,proj].forEach(el=>{
     el.addEventListener('change', ()=>{ updateHours(tr); saveData(); maybeAddAutoRow(); });
   });
 
@@ -52,19 +49,18 @@ function addRow(prefill={}) {
   tbody.appendChild(tr);
 }
 
-function updateHours(tr) {
+function updateHours(tr){
   const s = tr.children[1].querySelector('input').value;
   const e = tr.children[2].querySelector('input').value;
   if(!s || !e) return;
   const start = new Date(`1970-01-01T${s}:00`);
   const end = new Date(`1970-01-01T${e}:00`);
-  let diff = (end - start) / 36e5;
-  if (diff < 0) diff += 24; // over middernacht
+  let diff = (end - start) / 36e5; if(diff < 0) diff += 24;
   tr.querySelector('.workedHours').textContent = (isFinite(diff)?diff:0).toFixed(2);
 }
 
-function saveData() {
-  const rows = qsa('#urenBody tr').map(tr => ({
+function saveData(){
+  const rows = qsa('#urenBody tr').map(tr=>({
     datum: tr.children[0].querySelector('input').value,
     start: tr.children[1].querySelector('input').value,
     eind: tr.children[2].querySelector('input').value,
@@ -72,9 +68,10 @@ function saveData() {
     uren: tr.children[4].textContent
   })).filter(r => r.datum || r.start || r.eind || r.project);
   localStorage.setItem('urenregistratie', JSON.stringify(rows));
+  localStorage.setItem('uren_last_updated', String(Date.now()));
 }
 
-function getISOWeek(d) {
+function getISOWeek(d){
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - dayNum);
@@ -83,7 +80,7 @@ function getISOWeek(d) {
   return weekNo;
 }
 
-function closeWeek() {
+function closeWeek(){
   const data = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
   if(!data.length){ alert('Geen gegevens om op te slaan.'); return; }
   const today = new Date();
@@ -92,44 +89,44 @@ function closeWeek() {
   archives.push({ key, data, closedAt: new Date().toISOString() });
   localStorage.setItem('uren_archief', JSON.stringify(archives));
   localStorage.removeItem('urenregistratie');
+  localStorage.setItem('uren_last_updated', String(Date.now())); // trigger dashboards
+  // Reset UI
   qs('#urenBody').innerHTML='';
   for(let i=0;i<5;i++) addRow();
-  alert(`Week opgeslagen: ${key}`);
+  // Ga direct naar dashboard
+  window.location.href = 'dashboard.html?refresh=1';
 }
 
-function exportCSV(filename, rows) {
+function exportCSV(filename, rows){
   const headers = ['Datum','Start','Eind','Project','Uren'];
   const lines = [headers.join(',')];
-  rows.forEach(r => {
-    const line = [r.datum, r.start, r.eind, r.project, r.uren].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',');
+  rows.forEach(r=>{
+    const line = [r.datum,r.start,r.eind,r.project,r.uren].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',');
     lines.push(line);
   });
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([lines.join('\\n')], { type:'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
 }
 
-function exportActive() {
+function exportActive(){
   const active = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
   exportCSV('uren_actief.csv', active);
 }
 
-function maybeAddAutoRow() {
+function maybeAddAutoRow(){
   const rows = qsa('#urenBody tr');
   if(!rows.length) return;
   const last = rows[rows.length-1];
-  const hasValue = qsa('input, select', last).some(el=>el.value);
+  const hasValue = qsa('input,select', last).some(el=>el.value);
   if(hasValue) addRow();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', ()=>{
   qs('#addRowBtn').addEventListener('click', ()=>{ addRow(); saveData(); });
   qs('#closeWeekBtn').addEventListener('click', closeWeek);
   qs('#exportActiveBtn').addEventListener('click', exportActive);
 
   const existing = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
-  if(existing.length) existing.forEach(addRow);
-  else for(let i=0;i<5;i++) addRow();
+  if(existing.length) existing.forEach(addRow); else for(let i=0;i<5;i++) addRow();
 });

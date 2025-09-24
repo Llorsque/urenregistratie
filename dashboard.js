@@ -1,4 +1,4 @@
-// --- Dashboard logic ---
+// Dashboard logic with live sync
 function qs(s,ctx=document){return ctx.querySelector(s)}
 function qsa(s,ctx=document){return Array.from(ctx.querySelectorAll(s))}
 function parseISO(d){const x=new Date(d); return isNaN(x)?null:x}
@@ -11,18 +11,18 @@ function getISOWeek(d){
   return weekNo;
 }
 function getQuarter(d){ return Math.floor(d.getMonth()/3)+1 }
-function monthLabel(d){ return d.toLocaleString('nl-NL', { month: 'long', year: 'numeric' }) }
+function monthLabel(d){ return d.toLocaleString('nl-NL',{month:'long',year:'numeric'}) }
 
 function loadAllData(){
   const active = JSON.parse(localStorage.getItem('urenregistratie')||'[]');
   const archives = JSON.parse(localStorage.getItem('uren_archief')||'[]');
-  const archived = archives.flatMap(w => w.data || []);
-  return { active, archives, all: [...active, ...archived] };
+  const archived = archives.flatMap(w=>w.data||[]);
+  return { active, archives, all:[...active, ...archived] };
 }
 
 function renderWeeksSelect(rows){
   const weeks = new Set();
-  rows.forEach(r=>{const d=parseISO(r.datum); if(d) weeks.add(getISOWeek(d))});
+  rows.forEach(r=>{ const d=parseISO(r.datum); if(d) weeks.add(getISOWeek(d)); });
   const sel = qs('#filterWeek');
   sel.innerHTML = '<option value=\"\">Alle</option>' + Array.from(weeks).sort((a,b)=>a-b).map(w=>`<option value=\"${w}\">${w}</option>`).join('');
 }
@@ -42,31 +42,26 @@ function renderTable(rows){
   const wdSel = qs('#filterWeekday').value;
   if(wdSel===''){ qs('#avgWeekday').textContent='-'; }
   else{
-    const wd = parseInt(wdSel,10);
-    const subset = rows.filter(r=>{const d=parseISO(r.datum); return d && d.getDay()===wd});
+    const wd=parseInt(wdSel,10);
+    const subset = rows.filter(r=>{ const d=parseISO(r.datum); return d && d.getDay()===wd; });
     const avg = subset.length ? subset.reduce((a,b)=>a+(+b.uren||0),0)/subset.length : 0;
     qs('#avgWeekday').textContent = avg.toFixed(2);
   }
 }
 
 function groupBy(arr, keyFn){
-  return arr.reduce((acc, item)=>{
-    const k = keyFn(item);
-    acc[k] = (acc[k]||0) + (+item.uren||0);
-    return acc;
-  }, {});
+  return arr.reduce((acc,item)=>{
+    const k = keyFn(item); acc[k]=(acc[k]||0)+(+item.uren||0); return acc;
+  },{});
 }
 
 function renderSums(rows){
-  // per project
   const byProject = groupBy(rows, r=>r.project||'Onbekend');
   qs('#sumPerProject').innerHTML = Object.entries(byProject).sort().map(([k,v])=>`<tr><td>${k}</td><td class="right">${v.toFixed(2)}</td></tr>`).join('') || '<tr><td colspan="2">—</td></tr>';
-  // per maand
-  const byMonth = groupBy(rows, r=>{const d=parseISO(r.datum); return d?monthLabel(d):'—'});
+  const byMonth = groupBy(rows, r=>{ const d=parseISO(r.datum); return d?monthLabel(d):'—'; });
   qs('#sumPerMonth').innerHTML = Object.entries(byMonth).sort().map(([k,v])=>`<tr><td>${k}</td><td class="right">${v.toFixed(2)}</td></tr>`).join('') || '<tr><td colspan="2">—</td></tr>';
-  // per week
-  const byWeek = groupBy(rows, r=>{const d=parseISO(r.datum); return d?`W${getISOWeek(d)}`:'—'});
-  qs('#sumPerWeek').innerHTML = Object.entries(byWeek).sort((a,b)=>a[0].localeCompare(b[0], 'nl',{numeric:true})).map(([k,v])=>`<tr><td>${k}</td><td class="right">${v.toFixed(2)}</td></tr>`).join('') || '<tr><td colspan="2">—</td></tr>';
+  const byWeek = groupBy(rows, r=>{ const d=parseISO(r.datum); return d?`W${getISOWeek(d)}`:'—'; });
+  qs('#sumPerWeek').innerHTML = Object.entries(byWeek).sort((a,b)=>a[0].localeCompare(b[0],'nl',{numeric:true})).map(([k,v])=>`<tr><td>${k}</td><td class="right">${v.toFixed(2)}</td></tr>`).join('') || '<tr><td colspan="2">—</td></tr>';
 }
 
 function applyFilters(all){
@@ -119,47 +114,39 @@ function renderArchiveList(archives){
     box.appendChild(el);
   });
 
-  box.addEventListener('click', (e)=>{
+  box.onclick = (e)=>{
     const btn = e.target.closest('button'); if(!btn) return;
-    const key = btn.dataset.k; const act = btn.dataset.act;
+    const key=btn.dataset.k, act=btn.dataset.act;
     const archives = JSON.parse(localStorage.getItem('uren_archief')||'[]');
-    const w = archives.find(x=>x.key===key);
-    if(!w) return;
+    const w = archives.find(x=>x.key===key); if(!w) return;
     if(act==='export'){ exportCSV(`${key}.csv`, w.data||[]); }
-    if(act==='restore'){
-      localStorage.setItem('urenregistratie', JSON.stringify(w.data||[]));
-      alert(`Week ${key} naar 'actief' gezet. Ga naar invoerpagina om te bewerken.`);
-    }
-  }, { once: true });
+    if(act==='restore'){ localStorage.setItem('urenregistratie', JSON.stringify(w.data||[])); alert(`Week ${key} naar 'actief' gezet.`); }
+  };
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  const {{ all, archives }} = loadAllData();
+function fullRender(){
+  const { all, archives } = loadAllData();
   renderWeeksSelect(all);
   renderTable(all);
   renderSums(all);
   renderArchiveList(archives);
+}
 
-  qs('#applyFiltersBtn').addEventListener('click', ()=>{
-    const all = loadAllData().all;
-    applyFilters(all);
-  });
-  qs('#resetFiltersBtn').addEventListener('click', ()=>{
-    qsa('select,input[type="date"]','.filters').forEach(el=>el.value='');
-    const all = loadAllData().all;
-    renderWeeksSelect(all);
-    renderTable(all);
-    renderSums(all);
-  });
+document.addEventListener('DOMContentLoaded', ()=>{
+  fullRender();
+  qs('#applyFiltersBtn').addEventListener('click', ()=>{ const all = loadAllData().all; applyFilters(all); });
+  qs('#resetFiltersBtn').addEventListener('click', ()=>{ qsa('select,input[type="date"]','.filters').forEach(el=>el.value=''); fullRender(); });
+  qs('#exportViewBtn').addEventListener('click', ()=>{ const all = loadAllData().all; const view = applyFilters(all); exportCSV('uren_dashboard_zicht.csv', view); });
+  qs('#exportAllBtn').addEventListener('click', ()=>{ const all = loadAllData().all; exportCSV('uren_dashboard_alles.csv', all); });
+  qs('#printBtn').addEventListener('click', ()=>window.print());
+  qs('#refreshBtn').addEventListener('click', fullRender);
 
-  qs('#exportViewBtn').addEventListener('click', ()=>{
-    const all = loadAllData().all;
-    const view = applyFilters(all);
-    exportCSV('uren_dashboard_zicht.csv', view);
+  // Live updates bij wijziging in invoerpagina of bij afsluiten van week
+  window.addEventListener('storage', (e)=>{
+    if(['uren_archief','urenregistratie','uren_last_updated'].includes(e.key)){ fullRender(); }
   });
-  qs('#exportAllBtn').addEventListener('click', ()=>{
-    const all = loadAllData().all;
-    exportCSV('uren_dashboard_alles.csv', all);
-  });
-  qs('#printBtn').addEventListener('click', ()=>{ window.print(); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) fullRender(); });
+
+  // Force refresh if query contains refresh=1
+  if (new URLSearchParams(location.search).get('refresh') === '1') fullRender();
 });

@@ -6,7 +6,7 @@
   <title>Urenregistratie — Pro</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="ios-light">
+<body class="theme-peach-teal">
   <header class="topbar glass">
     <div class="brand">
       <span class="dot"></span>
@@ -16,23 +16,21 @@
       <a href="dashboard.html" class="btn primary">📊 Dashboard</a>
       <button id="exportActiveBtn" class="btn subtle">⬇︎ Export (actief)</button>
     </nav>
-    
     <div class="style-switch">
-      <label>Stijl
+      <label>Kleurthema
         <select id="styleSelect">
-          <option value="ios-light">iOS Light</option>
-          <option value="ios-dark">iOS Dark</option>
-          <option value="mono">Mono</option>
+          <option value="theme-peach-teal">Peach → Teal</option>
+          <option value="theme-blue-pink">Blue → Pink</option>
+          <option value="theme-mono">Mono</option>
         </select>
       </label>
     </div>
-
   </header>
 
   <main class="container">
     <section class="card glass">
       <div class="toolbar">
-        <div class="hint">Voer je uren in. De laatste rij vult → nieuwe rij verschijnt automatisch.</div>
+        <div class="hint">Voer je uren in. Bij de laatste ingevulde rij verschijnt automatisch een nieuwe.</div>
         <div class="actions">
           <button id="addRowBtn" class="btn">＋ Voeg regel toe</button>
           <button id="closeWeekBtn" class="btn warn">⎗ Sluit week af</button>

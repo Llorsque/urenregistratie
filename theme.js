@@ -1,19 +1,19 @@
 (function(){
-  function applyStored(){
-    const s = localStorage.getItem('ui_theme') || 'ios-light';
-    document.body.classList.remove('ios-light','ios-dark','mono');
-    document.body.classList.add(s);
+  const KEY = 'ui_theme';
+  function applyTheme(){
+    const theme = localStorage.getItem(KEY) || 'theme-peach-teal';
+    document.body.classList.remove('theme-peach-teal','theme-blue-pink','theme-mono');
+    document.body.classList.add(theme);
     const sel = document.getElementById('styleSelect');
-    if (sel) sel.value = s;
+    if(sel) sel.value = theme;
   }
   document.addEventListener('DOMContentLoaded', function(){
-    applyStored();
+    applyTheme();
     const sel = document.getElementById('styleSelect');
     if(!sel) return;
     sel.addEventListener('change', function(){
-      const v = sel.value;
-      localStorage.setItem('ui_theme', v);
-      applyStored();
+      localStorage.setItem(KEY, sel.value);
+      applyTheme();
     });
   });
 })();
