@@ -2,37 +2,55 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Urenregistratie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Urenregistratie — Pro</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h1>Urenregistratie</h1>
+  <div class="app-bg"></div>
+  <header class="topbar glass">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>Urenregistratie</h1>
+    </div>
     <nav>
-      <a href="dashboard.html" class="nav-button">📊 Dashboard</a>
+      <a href="dashboard.html" class="btn primary">📊 Dashboard</a>
+      <button id="exportActiveBtn" class="btn subtle">⬇︎ Export (actief)</button>
     </nav>
   </header>
-  <div class="container content">
-    <table id="urenTabel">
-      <thead>
-        <tr>
-          <th>Datum</th>
-          <th>Starttijd</th>
-          <th>Eindtijd</th>
-          <th>Project</th>
-          <th>Gewerkte uren</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="urenBody">
-      </tbody>
-    </table>
-    <div style="display:flex; gap: .5rem; flex-wrap: wrap;">
-      <button id="addRowBtn">Voeg regel toe</button>
-      <button id="closeWeekBtn">Sluit week af</button>
-    </div>
-  </div>
+
+  <main class="container">
+    <section class="card glass">
+      <div class="toolbar">
+        <div class="hint">Voer je uren in. De laatste rij vult → nieuwe rij verschijnt automatisch.</div>
+        <div class="actions">
+          <button id="addRowBtn" class="btn">＋ Voeg regel toe</button>
+          <button id="closeWeekBtn" class="btn warn">⎗ Sluit week af</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="urenTabel" class="ios-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Start</th>
+              <th>Einde</th>
+              <th>Project</th>
+              <th class="right">Uren</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="urenBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot glass">
+    <small>Data wordt lokaal opgeslagen in je browser (localStorage).</small>
+  </footer>
+
   <script src="app.js"></script>
 </body>
 </html>

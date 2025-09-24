@@ -2,83 +2,141 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — Urenregistratie</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h1>Dashboard</h1>
+  <div class="app-bg"></div>
+  <header class="topbar glass">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>Dashboard</h1>
+    </div>
     <nav>
-      <a href="index.html" class="nav-button">🔙 Terug</a>
+      <a href="index.html" class="btn subtle">← Terug</a>
+      <button id="exportViewBtn" class="btn">⬇︎ Export (zicht)</button>
+      <button id="exportAllBtn" class="btn subtle">⬇︎ Export (alles)</button>
+      <button id="printBtn" class="btn subtle">🖨︎ Print/PDF</button>
     </nav>
   </header>
-  <div class="container content">
-    <div class="filters">
-      <label>Datum
-        <input type="date" id="filterDate" />
-      </label>
-      <label>Project
-        <select id="filterProject">
-          <option value="">Alle projecten</option>
-          <option value="Opsterland">Opsterland</option>
-          <option value="Weststellingwerf">Weststellingwerf</option>
-          <option value="CO Algemeen">CO Algemeen</option>
-          <option value="Team Opwest">Team Opwest</option>
-          <option value="Overig">Overig</option>
-        </select>
-      </label>
-      <label>Weeknr
-        <select id="filterWeek">
-          <option value="">Alle</option>
-        </select>
-      </label>
-      <label>Kwartaal
-        <select id="filterQuarter">
-          <option value="">Alle</option>
-          <option value="1">Q1</option>
-          <option value="2">Q2</option>
-          <option value="3">Q3</option>
-          <option value="4">Q4</option>
-        </select>
-      </label>
-      <label>Weekdag
-        <select id="filterWeekday">
-          <option value="">Alle</option>
-          <option value="1">Maandag</option>
-          <option value="2">Dinsdag</option>
-          <option value="3">Woensdag</option>
-          <option value="4">Donderdag</option>
-          <option value="5">Vrijdag</option>
-          <option value="6">Zaterdag</option>
-          <option value="0">Zondag</option>
-        </select>
-      </label>
-      <div style="align-self:flex-end; display:flex; gap:.5rem;">
-        <button id="applyFiltersBtn">Filter</button>
-        <button id="resetFiltersBtn">Reset</button>
+
+  <main class="container">
+    <section class="card glass">
+      <h2>Filters</h2>
+      <div class="filters">
+        <label>Datum
+          <input type="date" id="filterDate">
+        </label>
+        <label>Project
+          <select id="filterProject">
+            <option value="">Alle projecten</option>
+            <option value="Opsterland">Opsterland</option>
+            <option value="Weststellingwerf">Weststellingwerf</option>
+            <option value="CO Algemeen">CO Algemeen</option>
+            <option value="Team Opwest">Team Opwest</option>
+            <option value="Overig">Overig</option>
+          </select>
+        </label>
+        <label>Weeknr
+          <select id="filterWeek"><option value="">Alle</option></select>
+        </label>
+        <label>Kwartaal
+          <select id="filterQuarter">
+            <option value="">Alle</option>
+            <option value="1">Q1</option>
+            <option value="2">Q2</option>
+            <option value="3">Q3</option>
+            <option value="4">Q4</option>
+          </select>
+        </label>
+        <label>Weekdag
+          <select id="filterWeekday">
+            <option value="">Alle</option>
+            <option value="1">Maandag</option>
+            <option value="2">Dinsdag</option>
+            <option value="3">Woensdag</option>
+            <option value="4">Donderdag</option>
+            <option value="5">Vrijdag</option>
+            <option value="6">Zaterdag</option>
+            <option value="0">Zondag</option>
+          </select>
+        </label>
+        <div class="filter-actions">
+          <button id="applyFiltersBtn" class="btn">Filter</button>
+          <button id="resetFiltersBtn" class="btn subtle">Reset</button>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <table id="dashboardTable">
-      <thead>
-        <tr>
-          <th>Datum</th>
-          <th>Starttijd</th>
-          <th>Eindtijd</th>
-          <th>Project</th>
-          <th>Gewerkte uren</th>
-          <th>Weeknr</th>
-        </tr>
-      </thead>
-      <tbody id="dashboardBody"></tbody>
-    </table>
+    <section class="grid">
+      <div class="card stat glass">
+        <h3>Totaal uren</h3>
+        <div class="big" id="totaalUren">0.00</div>
+      </div>
+      <div class="card stat glass">
+        <h3>Gem. per gekozen weekdag</h3>
+        <div class="big" id="avgWeekday">-</div>
+      </div>
+      <div class="card stat glass">
+        <h3>Aantal regels</h3>
+        <div class="big" id="rowCount">0</div>
+      </div>
+    </section>
 
-    <div id="stats">
-      <p><strong>Totaal uren:</strong> <span id="totaalUren">0.00</span></p>
-      <p><strong>Gemiddeld per geselecteerde weekdag:</strong> <span id="avgWeekday">-</span></p>
-    </div>
-  </div>
+    <section class="grid">
+      <div class="card glass">
+        <h3>Per project</h3>
+        <table class="mini">
+          <thead><tr><th>Project</th><th class="right">Uren</th></tr></thead>
+          <tbody id="sumPerProject"></tbody>
+        </table>
+      </div>
+      <div class="card glass">
+        <h3>Per maand</h3>
+        <table class="mini">
+          <thead><tr><th>Maand</th><th class="right">Uren</th></tr></thead>
+          <tbody id="sumPerMonth"></tbody>
+        </table>
+      </div>
+      <div class="card glass">
+        <h3>Per weeknr</h3>
+        <table class="mini">
+          <thead><tr><th>Week</th><th class="right">Uren</th></tr></thead>
+          <tbody id="sumPerWeek"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card glass">
+      <h2>Regels</h2>
+      <div class="table-wrap">
+        <table class="ios-table" id="dashboardTable">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Start</th>
+              <th>Einde</th>
+              <th>Project</th>
+              <th class="right">Uren</th>
+              <th>Week</th>
+            </tr>
+          </thead>
+          <tbody id="dashboardBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card glass">
+      <h2>Archief (weken)</h2>
+      <div id="archiveList" class="archive-list"></div>
+    </section>
+  </main>
+
+  <footer class="foot glass">
+    <small>Actief + archief worden samengevoegd voor dit overzicht.</small>
+  </footer>
+
   <script src="dashboard.js"></script>
 </body>
 </html>
