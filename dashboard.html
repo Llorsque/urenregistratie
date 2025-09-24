@@ -6,8 +6,7 @@
   <title>Dashboard — Urenregistratie</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="app-bg"></div>
+<body class="ios-light">
   <header class="topbar glass">
     <div class="brand">
       <span class="dot"></span>
@@ -19,6 +18,17 @@
       <button id="exportAllBtn" class="btn subtle">⬇︎ Export (alles)</button>
       <button id="printBtn" class="btn subtle">🖨︎ Print/PDF</button>
     </nav>
+    
+    <div class="style-switch">
+      <label>Stijl
+        <select id="styleSelect">
+          <option value="ios-light">iOS Light</option>
+          <option value="ios-dark">iOS Dark</option>
+          <option value="mono">Mono</option>
+        </select>
+      </label>
+    </div>
+
   </header>
 
   <main class="container">
@@ -138,5 +148,6 @@
   </footer>
 
   <script src="dashboard.js"></script>
+  <script src="theme.js"></script>
 </body>
 </html>

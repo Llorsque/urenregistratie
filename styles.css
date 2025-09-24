@@ -1,4 +1,4 @@
-/* iOS-like Pro UI */
+/* iOS-like gradients only (no images) */
 :root {
   --glass-bg: rgba(255,255,255,0.65);
   --stroke: #e5e5ea;
@@ -13,15 +13,33 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
-  background: #0a0a0a;
+  /* default background assigned via class */
 }
-.app-bg {
-  position: fixed;
-  inset: 0;
-  background: url('assets/wallpaper.jpg') center/cover no-repeat;
-  filter: saturate(110%) brightness(1);
-  z-index: -2;
+/* iOS light gradient */
+body.ios-light {
+  background:
+    radial-gradient(1200px 600px at 10% 10%, #eaf2ff 0%, transparent 60%),
+    radial-gradient(900px 700px at 90% 20%, #ffeef8 0%, transparent 60%),
+    radial-gradient(1000px 800px at 50% 100%, #e9fff3 0%, transparent 60%),
+    linear-gradient(180deg, #f8f9fb 0%, #eef1f6 100%);
 }
+/* iOS dark gradient */
+body.ios-dark {
+  color: #f2f2f7;
+  --text: #f2f2f7;
+  --glass-bg: rgba(28,28,30,0.55);
+  --stroke: rgba(235,235,245,0.18);
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(64,156,255,0.18) 0%, transparent 60%),
+    radial-gradient(900px 700px at 90% 20%, rgba(255,69,149,0.15) 0%, transparent 60%),
+    radial-gradient(1000px 800px at 50% 100%, rgba(50,215,75,0.15) 0%, transparent 60%),
+    linear-gradient(180deg, #0b0c10 0%, #16181f 100%);
+}
+/* Mono minimal */
+body.mono {
+  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+}
+
 .topbar, .foot, .card.glass {
   background: var(--glass-bg);
   backdrop-filter: blur(14px) saturate(140%);
@@ -35,18 +53,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 .brand { display: flex; gap: 10px; align-items: center; }
 .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
-.container {
-  max-width: 1100px;
-  margin: 16px auto;
-  padding: 12px;
+.style-switch label { display: flex; gap: 8px; align-items: center; color: var(--subtle); }
+.style-switch select {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  background: #fff;
 }
+
+.container { max-width: 1100px; margin: 16px auto; padding: 12px; }
 .card { padding: 16px; margin-bottom: 16px; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .hint { color: var(--subtle); }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
 .btn {
   border: 1px solid var(--stroke);
   background: #ffffff;
@@ -61,6 +86,7 @@ body {
 .btn.subtle { background: #f2f2f7; }
 .btn.warn { background: var(--warn); color: #fff; border: none; }
 .btn:hover { filter: brightness(0.97); }
+
 .table-wrap { overflow: auto; border-radius: 12px; }
 table { width: 100%; border-collapse: collapse; }
 .ios-table th { background: #f2f2f7; }
@@ -74,13 +100,11 @@ input[type="date"], input[type="time"], select {
   background: #fff;
   font-size: 15px;
 }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .stat .big { font-size: 2rem; font-weight: 800; }
 .mini th, .mini td { padding: 8px 10px; }
+
 .archive-list > .archive-item {
   border: 1px dashed var(--stroke);
   border-radius: 14px;
@@ -91,15 +115,16 @@ input[type="date"], input[type="time"], select {
   align-items: center;
 }
 .archive-item .meta { color: var(--subtle); }
+
 .foot { margin: 12px; padding: 10px 14px; text-align: center; }
 
 @media (max-width: 900px) {
   .grid { grid-template-columns: 1fr; }
-  .topbar { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .topbar { flex-direction: column; align-items: stretch; }
 }
 
 @media print {
-  .topbar, .foot, .filters, nav, .btn { display: none !important; }
+  .topbar, .foot, .filters, nav, .btn, .style-switch { display: none !important; }
   body { background: #fff; }
   .card.glass { border: none; }
 }

@@ -6,8 +6,7 @@
   <title>Urenregistratie — Pro</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="app-bg"></div>
+<body class="ios-light">
   <header class="topbar glass">
     <div class="brand">
       <span class="dot"></span>
@@ -17,6 +16,17 @@
       <a href="dashboard.html" class="btn primary">📊 Dashboard</a>
       <button id="exportActiveBtn" class="btn subtle">⬇︎ Export (actief)</button>
     </nav>
+    
+    <div class="style-switch">
+      <label>Stijl
+        <select id="styleSelect">
+          <option value="ios-light">iOS Light</option>
+          <option value="ios-dark">iOS Dark</option>
+          <option value="mono">Mono</option>
+        </select>
+      </label>
+    </div>
+
   </header>
 
   <main class="container">
@@ -52,5 +62,6 @@
   </footer>
 
   <script src="app.js"></script>
+  <script src="theme.js"></script>
 </body>
 </html>
