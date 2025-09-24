@@ -47,7 +47,7 @@ function saveData() {
     const datum = row.children[0].children[0].value;
     const start = row.children[1].children[0].value;
     const eind = row.children[2].children[0].value;
-    const project = row.children[3].children[0].value;
+    const project = row.children[3].querySelector("select").value;
     const uren = row.children[4].innerText;
 
     if (datum && start && eind && project) {

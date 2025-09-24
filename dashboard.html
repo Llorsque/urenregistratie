@@ -14,7 +14,14 @@
         <input type="date" id="filterDate" />
       </label>
       <label>Filter op project:
-        <input type="text" id="filterProject" placeholder="Projectnaam" />
+        <select id="filterProject">
+          <option value="">Alle projecten</option>
+          <option value="Opsterland">Opsterland</option>
+          <option value="Weststellingwerf">Weststellingwerf</option>
+          <option value="CO Algemeen">CO Algemeen</option>
+          <option value="Team Opwest">Team Opwest</option>
+          <option value="Overig">Overig</option>
+        </select>
       </label>
       <button onclick="applyFilters()">Filter</button>
       <button onclick="resetFilters()">Reset</button>
@@ -34,6 +41,8 @@
         <!-- Data wordt geladen uit localStorage -->
       </tbody>
     </table>
+
+    <p><strong>Totaal gewerkte uren:</strong> <span id="totaalUren">0</span> uur</p>
   </div>
   <script src="dashboard.js"></script>
 </body>
