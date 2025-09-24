@@ -37,3 +37,26 @@ function updateHours(element) {
     row.querySelector('.workedHours').innerText = diff.toFixed(2);
   }
 }
+
+
+function saveData() {
+  const rows = document.querySelectorAll('#urenBody tr');
+  const data = [];
+
+  rows.forEach(row => {
+    const datum = row.children[0].children[0].value;
+    const start = row.children[1].children[0].value;
+    const eind = row.children[2].children[0].value;
+    const project = row.children[3].children[0].value;
+    const uren = row.children[4].innerText;
+
+    if (datum && start && eind && project) {
+      data.push({ datum, start, eind, project, uren });
+    }
+  });
+
+  localStorage.setItem('urenregistratie', JSON.stringify(data));
+}
+
+// Automatisch opslaan bij wijziging
+document.getElementById('urenTabel').addEventListener('change', saveData);
