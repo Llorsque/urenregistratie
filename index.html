@@ -14,7 +14,6 @@
     </nav>
   </header>
   <div class="container content">
-    <h1>Urenregistratie</h1>
     <table id="urenTabel">
       <thead>
         <tr>
@@ -27,11 +26,12 @@
         </tr>
       </thead>
       <tbody id="urenBody">
-        <!-- Dynamische rijen -->
       </tbody>
     </table>
-    <button id="addRowBtn">Voeg regel toe</button>
-    <button id="closeWeekBtn">Sluit week af</button>
+    <div style="display:flex; gap: .5rem; flex-wrap: wrap;">
+      <button id="addRowBtn">Voeg regel toe</button>
+      <button id="closeWeekBtn">Sluit week af</button>
+    </div>
   </div>
   <script src="app.js"></script>
 </body>

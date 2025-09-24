@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Uren</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,12 +14,11 @@
     </nav>
   </header>
   <div class="container content">
-    <h1>Overzicht gewerkte uren</h1>
     <div class="filters">
-      <label>Filter op datum:
+      <label>Datum
         <input type="date" id="filterDate" />
       </label>
-      <label>Filter op project:
+      <label>Project
         <select id="filterProject">
           <option value="">Alle projecten</option>
           <option value="Opsterland">Opsterland</option>
@@ -29,8 +28,36 @@
           <option value="Overig">Overig</option>
         </select>
       </label>
-      <button onclick="applyFilters()">Filter</button>
-      <button onclick="resetFilters()">Reset</button>
+      <label>Weeknr
+        <select id="filterWeek">
+          <option value="">Alle</option>
+        </select>
+      </label>
+      <label>Kwartaal
+        <select id="filterQuarter">
+          <option value="">Alle</option>
+          <option value="1">Q1</option>
+          <option value="2">Q2</option>
+          <option value="3">Q3</option>
+          <option value="4">Q4</option>
+        </select>
+      </label>
+      <label>Weekdag
+        <select id="filterWeekday">
+          <option value="">Alle</option>
+          <option value="1">Maandag</option>
+          <option value="2">Dinsdag</option>
+          <option value="3">Woensdag</option>
+          <option value="4">Donderdag</option>
+          <option value="5">Vrijdag</option>
+          <option value="6">Zaterdag</option>
+          <option value="0">Zondag</option>
+        </select>
+      </label>
+      <div style="align-self:flex-end; display:flex; gap:.5rem;">
+        <button id="applyFiltersBtn">Filter</button>
+        <button id="resetFiltersBtn">Reset</button>
+      </div>
     </div>
 
     <table id="dashboardTable">
@@ -41,14 +68,16 @@
           <th>Eindtijd</th>
           <th>Project</th>
           <th>Gewerkte uren</th>
+          <th>Weeknr</th>
         </tr>
       </thead>
-      <tbody id="dashboardBody">
-        <!-- Data wordt geladen uit localStorage -->
-      </tbody>
+      <tbody id="dashboardBody"></tbody>
     </table>
 
-    <p><strong>Totaal gewerkte uren:</strong> <span id="totaalUren">0</span> uur</p>
+    <div id="stats">
+      <p><strong>Totaal uren:</strong> <span id="totaalUren">0.00</span></p>
+      <p><strong>Gemiddeld per geselecteerde weekdag:</strong> <span id="avgWeekday">-</span></p>
+    </div>
   </div>
   <script src="dashboard.js"></script>
 </body>
